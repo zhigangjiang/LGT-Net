@@ -1,0 +1,8 @@
+opencv-python
+PyQt5
+PyOpenGL
+pyglm==1.99.0
+numpy
+scipy
+matplotlib
+imageio

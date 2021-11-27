@@ -1,0 +1,7 @@
+numpy
+torch
+torchvision
+yacs
+einops
+opencv-python
+pylsd-nova
