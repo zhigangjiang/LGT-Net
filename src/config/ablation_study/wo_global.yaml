@@ -1,0 +1,43 @@
+COMMENT: 'Ablation Study: w/o Global Block on MatterportLayout'
+VAL_NAME: 'test'
+TAG: 'ablation_study_wo_global'
+SEED: 123
+MODEL:
+  NAME: 'LGT_Net'
+  ARGS: [{
+    'decoder_name': 'Swin_Transformer',
+    'win_size': 16,
+    'rpe':'lr_parameter_mirror',
+    'dropout': 0.0,
+    'output_name': 'LGT'
+  }]
+TRAIN:
+  DEVICE: 'cuda:0'
+  SCRATCH: False
+  DETERMINISTIC: True
+  CRITERION:
+    DEPTH:
+      WEIGHT: 0.9
+    RATIO:
+      WEIGHT: 0.1
+    GRAD:
+      WEIGHT: 0.1
+      WEIGHTS: [ 1.0, 1.0 ]
+  BASE_LR:
+    1e-4
+  RESUME_LAST: False
+  OPTIMIZER:
+    NAME: 'adam'
+  EPOCHS: 1000
+DATA:
+  DATASET: 'mp3d'
+  DIR: 'src/dataset/mp3d'
+  BATCH_SIZE: 6
+  NUM_WORKERS: 6
+  FOR_TEST_INDEX: None
+  AUG:
+    FLIP: True
+    STRETCH: True
+    ROTATE: True
+    GAMMA: True
+AMP_OPT_LEVEL: 'O0'
