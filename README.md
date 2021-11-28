@@ -6,6 +6,7 @@ This is PyTorch implementation of our paper "LGT-Net: Indoor Panoramic Room Layo
 **We provide a [demo script](https://colab.research.google.com/drive/1mvwXVXGlrkApdMW6_8_prFBHjxwTReA6?usp=sharing) that runs on [Google Clobe](https://colab.research.google.com/) and recommend that you test directly on it.**
 
 
+
 # Installation
 Install our dependencies:
 ```shell
