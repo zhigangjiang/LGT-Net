@@ -1,5 +1,6 @@
-COMMENT: 'Training on Stanford2D-3D(train)+PanoContext(whole)'
-TAG: 's2d3d'
+COMMENT: 'Training on MatterportLayout'
+VAL_NAME: 'test'
+TAG: 'mp3d_scheduler'
 SEED: 123
 MODEL:
   NAME: 'LGT_Net'
@@ -12,7 +13,7 @@ MODEL:
     'output_name': 'LGT'
   } ]
 TRAIN:
-  DEVICE: 'cuda:2'
+  DEVICE: 'cuda:0'
   SCRATCH: False
   DETERMINISTIC: True
   CRITERION:
@@ -24,15 +25,17 @@ TRAIN:
       WEIGHT: 0.1
       WEIGHTS: [ 1.0, 1.0 ]
   BASE_LR:
-    1e-4
+    3e-4
   RESUME_LAST: False
   OPTIMIZER:
     NAME: 'adam'
   EPOCHS: 1000
+  LR_SCHEDULER:
+    NAME: 'StepLR'
+    ARGS: [ { 'step_size': 20, 'gamma': 0.9, 'last_epoch': -1} ]
 DATA:
-  DATASET: 'pano_s2d3d_mix'
-  DIR: 'src/dataset/pano_s2d3d'
-  SUBSET: 's2d3d'
+  DATASET: 'mp3d'
+  DIR: 'src/dataset/mp3d'
   BATCH_SIZE: 6
   NUM_WORKERS: 6
   FOR_TEST_INDEX: None

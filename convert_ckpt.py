@@ -16,7 +16,7 @@ def parse_option():
                         type=str,
                         required=True,
                         metavar='FILE',
-                        help='path of config2 file')
+                        help='path of config file')
 
     parser.add_argument('--output_path',
                         type=str,
@@ -43,7 +43,7 @@ def convert_ckpt():
         return
     model_path = os.path.join(ck_dir, model_paths[0])
     print(f"Loading {model_path}")
-    checkpoint = torch.load(model_path)
+    checkpoint = torch.load(model_path, map_location=torch.device('cuda:0'))
     net = checkpoint['net']
     output_path = None
     if args.output_path is None:
@@ -53,6 +53,7 @@ def convert_ckpt():
     if output_path is None:
         print("Output path is invalid")
     print(f"Save on: {output_path}")
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     torch.save(net, output_path)
 
 

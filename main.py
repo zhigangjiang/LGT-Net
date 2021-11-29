@@ -41,9 +41,8 @@ def parse_option():
     parser = argparse.ArgumentParser(description='Panorama Layout Transformer training and evaluation script')
     parser.add_argument('--cfg',
                         type=str,
-                        default='src/config2/debug.yaml' if debug else 'src/config2/weight/cnn_transformer_17.yaml',
                         metavar='FILE',
-                        help='path to config2 file')
+                        help='path to config file')
 
     parser.add_argument('--mode',
                         type=str,
@@ -111,14 +110,14 @@ def main():
         nprocs = len(config.TRAIN.DEVICE.split(':')[-1].split(','))
     if 'cuda' in config.TRAIN.DEVICE:
         if not torch.cuda.is_available():
-            print(f"Cuda is not available(config2 is: {config.TRAIN.DEVICE}), will use cpu ...")
+            print(f"Cuda is not available(config is: {config.TRAIN.DEVICE}), will use cpu ...")
             config.defrost()
             config.TRAIN.DEVICE = "cpu"
             config.freeze()
             nprocs = 1
 
     if config.MODE == 'train':
-        with open(os.path.join(config.CKPT.DIR, "config2.yaml"), "w") as f:
+        with open(os.path.join(config.CKPT.DIR, "config.yaml"), "w") as f:
             f.write(config.dump(allow_unicode=True))
 
     if config.TRAIN.DEVICE == 'cpu' or nprocs < 2:
@@ -136,8 +135,8 @@ def main_worker(local_rank, cfg, world_size):
     logger.info(f"Comment: {config.COMMENT}")
     cur_pid = os.getpid()
     logger.info(f"Current process id: {cur_pid}")
-    # torch.hub._hub_dir = config.CKPT.PYTORCH
-    # logger.info(f"Pytorch hub dir: {torch.hub._hub_dir}")
+    torch.hub._hub_dir = config.CKPT.PYTORCH
+    logger.info(f"Pytorch hub dir: {torch.hub._hub_dir}")
     init_env(config.SEED, config.TRAIN.DETERMINISTIC, config.DATA.NUM_WORKERS)
 
     model, optimizer, criterion, scheduler = build_model(config, logger)
@@ -275,7 +274,7 @@ def val_an_epoch(model, val_data_loader, criterion, config, logger, writer, epoc
         dt = model(imgs)
 
         vis_w = config.TRAIN.VIS_WEIGHT
-        visualization = (config.LOCAL_RANK == 0 and i == show_index) or config.SAVE_EVAL
+        visualization = False  # (config.LOCAL_RANK == 0 and i == show_index) or config.SAVE_EVAL
 
         loss, batch_loss_d, epoch_loss_d = calc_criterion(criterion, gt, dt, epoch_loss_d)
 
