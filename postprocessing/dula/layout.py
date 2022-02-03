@@ -31,7 +31,7 @@ def fit_layout(floor_xz, need_cube=False, show=False, block_eps=0.05):
     center = np.array([side_l / 2, side_l / 2])
     polys = cv2.findContours(floorplan, 1, 2)
     if isinstance(polys, tuple):
-        polys = polys[0]
+        polys = list(polys[0])
     polys.sort(key=lambda x: cv2.contourArea(x), reverse=True)
     poly = polys[0]
     sub_x, sub_y, w, h = cv2.boundingRect(poly)

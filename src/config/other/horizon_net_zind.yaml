@@ -1,5 +1,5 @@
 COMMENT: 'Using our framework to implement HorizonNet, Training on ZInd'
-TAG: 'mp3d'
+TAG: 'zind'
 SEED: 123
 MODEL:
   NAME: 'LGT_Net'

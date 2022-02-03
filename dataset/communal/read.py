@@ -208,6 +208,7 @@ def read_zind(partition_path, simplicity_path, data_dir, mode, is_simple=True,
                 'corners': corners,
                 'objects': objects,
                 'ratio': ratio,
-                'id': f'{house_index}_{pano_index}'
+                'id': f'{house_index}_{pano_index}',
+                'is_inside': pano['is_inside']
             })
     return pano_list

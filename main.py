@@ -27,7 +27,7 @@ from utils.logger import build_logger
 from utils.misc import tensor2np_d, tensor2np
 from dataset.build import build_loader
 from evaluation.accuracy import calc_accuracy, show_heat_map, calc_ce, calc_pe, calc_rmse_delta_1, \
-    show_depth_normal_grad
+    show_depth_normal_grad, calc_f1_score
 from postprocessing.post_process import post_process
 
 try:
@@ -67,6 +67,9 @@ def parse_option():
 
     parser.add_argument('--need_cpe', action='store_true',
                         help='need to evaluate corner error and pixel error')
+
+    parser.add_argument('--need_f1', action='store_true',
+                        help='need to evaluate f1-score of corners')
 
     parser.add_argument('--need_rmse', action='store_true',
                         help='need to evaluate root mean squared error and delta error')
@@ -260,6 +263,9 @@ def val_an_epoch(model, val_data_loader, criterion, config, logger, writer, epoc
     epoch_other_d = {
         'ce': [],
         'pe': [],
+        'f1': [],
+        'precision': [],
+        'recall': [],
         'rmse': [],
         'delta_1': []
     }
@@ -286,8 +292,15 @@ def val_an_epoch(model, val_data_loader, criterion, config, logger, writer, epoc
             if config.EVAL.FORCE_CUBE and config.EVAL.NEED_CPE:
                 ce = calc_ce(tensor2np_d(dt), tensor2np_d(gt))
                 pe = calc_pe(tensor2np_d(dt), tensor2np_d(gt))
+
                 epoch_other_d['ce'].append(ce)
                 epoch_other_d['pe'].append(pe)
+
+            if config.EVAL.NEED_F1:
+                f1, precision, recall = calc_f1_score(tensor2np_d(dt), tensor2np_d(gt))
+                epoch_other_d['f1'].append(f1)
+                epoch_other_d['precision'].append(precision)
+                epoch_other_d['recall'].append(recall)
 
         if config.EVAL.NEED_RMSE:
             rmse, delta_1 = calc_rmse_delta_1(tensor2np_d(dt), tensor2np_d(gt))

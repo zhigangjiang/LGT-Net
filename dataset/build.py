@@ -106,7 +106,8 @@ def build_dataset(mode, config, logger):
             for_test_index=config.DATA.FOR_TEST_INDEX,
             is_simple=True,
             is_ceiling_flat=False,
-            keys=config.DATA.KEYS
+            keys=config.DATA.KEYS,
+            vp_align=config.EVAL.POST_PROCESSING == 'manhattan'
         )
     else:
         raise NotImplementedError(f"Unknown dataset: {name}")

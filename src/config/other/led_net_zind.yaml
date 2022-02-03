@@ -1,5 +1,5 @@
 COMMENT: 'Using our framework to implement LED2-Net, Training on ZInd'
-TAG: 'mp3d'
+TAG: 'zind'
 SEED: 123
 MODEL:
   NAME: 'LGT_Net'
@@ -24,8 +24,8 @@ TRAIN:
   OPTIMIZER:
     NAME: 'adam'
 DATA:
-  DATASET: 'mp3d'
-  DIR: 'src/dataset/mp3d'
+  DATASET: 'zind'
+  DIR: 'src/dataset/zind'
   BATCH_SIZE: 6
   NUM_WORKERS: 6
   FOR_TEST_INDEX: None

@@ -4,7 +4,9 @@
 """
 import numpy as np
 import cv2
+import scipy
 
+from evaluation.f1_score import f1_score_2d
 from loss import GradLoss
 from utils.boundary import corners2boundaries, layout2depth
 from utils.conversion import depth2xyz, uv2xyz, get_u, depth2uv, xyz2uv, uv2pixel
@@ -178,6 +180,37 @@ def calc_rmse_delta_1(dt, gt):
         rmse_s.append(rmse)
         delta_1_s.append(delta_1)
     return np.array(rmse_s).mean(), np.array(delta_1_s).mean()
+
+
+def calc_f1_score(dt, gt, threshold=10):
+    w = 1024
+    h = 512
+    f1_s = []
+    precision_s = []
+    recall_s = []
+    for i in range(len(gt['corners'])):
+        floor_gt_corners = gt['corners'][i]
+        # Take effective corners
+        floor_gt_corners = floor_gt_corners[floor_gt_corners[..., 0] + floor_gt_corners[..., 1] != 0]
+        floor_gt_corners = np.roll(floor_gt_corners, -np.argmin(floor_gt_corners[..., 0]), 0)
+        gt_ratio = gt['ratio'][i][0]
+        ceil_gt_corners = corners2boundaries(gt_ratio, corners_uv=floor_gt_corners, step=None)[1]
+        gt_corners = np.concatenate((floor_gt_corners, ceil_gt_corners))
+        gt_corners = uv2pixel(gt_corners, w, h)
+
+        floor_dt_corners = xyz2uv(dt['processed_xyz'][i])
+        floor_dt_corners = np.roll(floor_dt_corners, -np.argmin(floor_dt_corners[..., 0]), 0)
+        dt_ratio = dt['ratio'][i][0]
+        ceil_dt_corners = corners2boundaries(dt_ratio, corners_uv=floor_dt_corners, step=None)[1]
+        dt_corners = np.concatenate((floor_dt_corners, ceil_dt_corners))
+        dt_corners = uv2pixel(dt_corners, w, h)
+
+        Fs, Ps, Rs = f1_score_2d(gt_corners, dt_corners, [threshold])
+        f1_s.append(Fs[0])
+        precision_s.append(Ps[0])
+        recall_s.append(Rs[0])
+
+    return np.array(f1_s).mean(), np.array(precision_s).mean(), np.array(recall_s).mean()
 
 
 def show_heat_map(dt, gt, vis_w=1024):

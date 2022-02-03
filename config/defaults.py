@@ -203,6 +203,7 @@ _C.DATA.KEYS = []
 _C.EVAL = CN()
 _C.EVAL.POST_PROCESSING = None
 _C.EVAL.NEED_CPE = False
+_C.EVAL.NEED_F1 = False
 _C.EVAL.NEED_RMSE = False
 _C.EVAL.FORCE_CUBE = False
 
@@ -242,6 +243,9 @@ def get_config(args=None):
 
         if 'need_cpe' in args and args.need_cpe:
             config.EVAL.NEED_CPE = args.need_cpe
+
+        if 'need_f1' in args and args.need_f1:
+            config.EVAL.NEED_F1 = args.need_f1
 
         if 'need_rmse' in args and args.need_rmse:
             config.EVAL.NEED_RMSE = args.need_rmse
