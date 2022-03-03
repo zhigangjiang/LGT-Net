@@ -29,10 +29,6 @@ macOS need to be aware of this issue:
 # Preparing Dataset
 ### MatterportLayout
 Office MatterportLayout dataset is at [here](https://github.com/ericsujw/Matterport3DLayoutAnnotation).
->**For reviewers**, you can directly download our processed dataset in [here](https://drive.google.com/file/d/1rEWXy5zHVozHC0hKHsuHTxchrNHfYoJ4/view?usp=sharing)
-> (stitched skybox images and aligned vanishing points, size: 1.25 GB), We may remove this download link in the future, and recommend that you obtain the data set from the [official home page](https://github.com/ericsujw/Matterport3DLayoutAnnotation).
-> </br>**License:** By using this dataset, you agree to all the terms in the [Matterport3D Terms of Use](http://kaldir.vc.in.tum.de/matterport/MP_TOS.pdf).
-
 
 Make sure the dataset files are stored as follows:
 ```
