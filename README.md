@@ -1,5 +1,5 @@
 # LGT-Net
-This is PyTorch implementation of our paper "LGT-Net: Indoor Panoramic Room Layout Estimation with Geometry-Aware Transformer Network".
+This is PyTorch implementation of our paper "[LGT-Net: Indoor Panoramic Room Layout Estimation with Geometry-Aware Transformer Network](https://arxiv.org/abs/2203.01824)".
 
 ![network](src/fig/network.png)
 # Demo
