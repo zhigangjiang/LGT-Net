@@ -68,7 +68,7 @@ def get_grad(direction):
     """
     a = torch.roll(direction, -1, dims=1)  # xz[i+1]
     b = torch.roll(direction, 1, dims=1)  # xz[i-1]
-    grad = torch.acos(torch.clip(a[..., 0] * b[..., 0] + a[..., 1] * b[..., 1], 0, 1))
+    grad = torch.acos(torch.clip(a[..., 0] * b[..., 0] + a[..., 1] * b[..., 1], -1+1e-6, 1-1e-6))
     return grad
 
 
@@ -78,8 +78,8 @@ def get_grad2(angle, grad_conv):
     :param grad_conv:
     :return:[b patch_num]
     """
-    angle = torch.sin(angle)  # 这么做是保证值连续，否则会有-pi, pi和 0, 2pi
-    angle = angle + 1  # 保证值同号 [0, 1]
+    angle = torch.sin(angle)
+    angle = angle + 1
 
     angle = torch.cat([angle[..., -1:], angle, angle[..., :1]], dim=-1)
     grad = grad_conv(angle[:, None])  # [b, patch_num] -> [b, 1, patch_num]
