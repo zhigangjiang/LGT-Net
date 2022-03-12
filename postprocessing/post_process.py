@@ -6,6 +6,7 @@ import numpy as np
 import cv2
 
 from postprocessing.dula.layout import fit_layout
+from postprocessing.dula.layout_old import fit_layout_old
 from utils.conversion import depth2xyz, xyz2depth
 
 
@@ -17,6 +18,8 @@ def post_process(b_depth, type_name='manhattan', need_cube=False):
     for xyz in b_xyz:
         if type_name == 'manhattan':
             processed_xz = fit_layout(floor_xz=xyz[..., ::2], need_cube=need_cube, show=False)
+        elif type_name == 'manhattan_old':
+            processed_xz = fit_layout_old(floor_xz=xyz[..., ::2], need_cube=need_cube, show=False)
         elif type_name == 'atalanta':
             processed_xz = cv2.approxPolyDP(xyz[..., ::2].astype(np.float32), 0.1, False)[:, 0, :]
         else:
