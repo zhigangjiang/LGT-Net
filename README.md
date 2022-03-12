@@ -46,7 +46,7 @@ src/dataset/mp3d
 
 ---
 
-**Analyse**
+**Statistics**
 
 |  Split| All |4 Corners |6 Corners |8 Corners |>=10 Corners |
 |--|--|--|--|--|--|
@@ -71,7 +71,7 @@ src/dataset/zind
 |-- zind_partition.json
 ```
 
-**Analyse**
+**Statistics**
 
 |  Split| All |4 Corners |5 Corners |6 Corners |7 Corners |8 Corners|9 Corners |>=10 Corners |Manhattan |No-Manhattan(%) |
 |--|--|--|--|--|--|--|--|--|--|--|
