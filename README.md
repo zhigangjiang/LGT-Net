@@ -145,7 +145,7 @@ You can evaluate by executing the following command:
     python main.py --cfg src/config/s2d3d.yaml --mode test --need_cpe --post_processing manhattan --force_cube
     ```
     - `--post_processing` type of post-processing approach, 
-      we use [DuLa-Net](https://github.com/SunDaDenny/DuLa-Net) post-processing and optimize by adding occlusion detection to process `manhattan` constraint (`manhattan_old` represents the original method),
+      we use [DuLa-Net](https://github.com/SunDaDenny/DuLa-Net) post-processing and optimize by adding occlusion detection (described in [here](Post-Porcessing.md) ) to process `manhattan` constraint (`manhattan_old` represents the original method),
       use [DP algorithm](https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm)  to process `atalanta` constraint, default is disabled.
     - `--need_rmse` need to evaluate root mean squared error and delta error, default is disabled.
     - `--need_cpe` need to evaluate corner error and pixel error, default is disabled.
