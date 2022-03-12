@@ -1,15 +1,15 @@
 # Post-Processing 
 ## Step
 
-1. Simplifying polygon by [DP algorithm](https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm)
+1. Simplify polygon by [DP algorithm](https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm)
 
 ![img.png](src/fig/post_processing/img_0.png)
    
-2. Detecting occlusion, calculating box fill with 1 
+2. Detect occlusion, calculating box fill with 1 
 
 ![img.png](src/fig/post_processing/img_1.png)
 
-3. Filling in reasonable sampling section
+3. Fill in reasonable sampling section
 
 ![img.png](src/fig/post_processing/img_2.png)
    
