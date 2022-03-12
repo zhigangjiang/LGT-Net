@@ -62,7 +62,7 @@ def parse_option():
                         help='save eval result')
 
     parser.add_argument('--post_processing', type=str,
-                        choices=['manhattan', 'atalanta'],
+                        choices=['manhattan', 'atalanta', 'manhattan_old'],
                         help='type of postprocessing ')
 
     parser.add_argument('--need_cpe', action='store_true',

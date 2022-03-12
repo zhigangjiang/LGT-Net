@@ -8,7 +8,7 @@ MODEL:
     'win_size': 16,
     'rpe': 'lr_parameter_mirror',
     'dropout': 0.0,
-    'depth': 8,
+    'depth': 6,
     'output_name': 'LGT'
   } ]
 TRAIN:

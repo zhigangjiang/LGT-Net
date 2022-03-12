@@ -175,7 +175,7 @@ def inference():
         name = os.path.basename(img_path).split('.')[0]
         bar.set_description(name)
         img = np.array(Image.open(img_path).resize((1024, 512), Image.BICUBIC))[..., :3]
-        if args.post_processing == 'manhattan':
+        if args.post_processing is not None and 'manhattan' in args.post_processing:
             bar.set_description("Preprocessing")
             img, vp = preprocess(img, vp_cache_path=os.path.join(args.output_dir, f"{name}_vp.txt"))
 

@@ -55,7 +55,8 @@ src/dataset/mp3d
 |Val   |190   | 108 | 46 | 21 | 15 |
 |Test    |458   | 261 | 85 | 63 | 49 |
 
---
+---
+
 ### ZInd
 Office ZInd dataset is at [here](https://github.com/zillow/zind).
 
@@ -79,7 +80,7 @@ src/dataset/zind
 |Val    |  3080 | 1702 | 153  |  745 | 81  |  239 | 22  | 138  |2647 | 433(14.06%)|
 |Test    |  3170 | 1725 | 143  |  817 | 52  |  261 | 20  | 152  |2789  | 381(12.02%)|
 
---
+---
 
 ### PanoContext and Stanford 2D-3D
 We follow the same preprocessed pano/s2d3d  proposed by [HorizonNet](https://github.com/sunset1995/HorizonNet#dataset).
@@ -144,10 +145,12 @@ You can evaluate by executing the following command:
     python main.py --cfg src/config/s2d3d.yaml --mode test --need_cpe --post_processing manhattan --force_cube
     ```
     - `--post_processing` type of post-processing approach, 
-      we use [DuLa-Net](https://github.com/SunDaDenny/DuLa-Net) post-processing to process `manhattan` constraint, 
+      we use [DuLa-Net](https://github.com/SunDaDenny/DuLa-Net) post-processing and optimize by adding occlusion detection to process `manhattan` constraint (`manhattan_old` represents the original method),
       use [DP algorithm](https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm)  to process `atalanta` constraint, default is disabled.
     - `--need_rmse` need to evaluate root mean squared error and delta error, default is disabled.
     - `--need_cpe` need to evaluate corner error and pixel error, default is disabled.
+    - `--need_f1` need to evaluate corner metrics (Precision, Recall and F$_1$-score) 
+      with **10 pixels** as threshold(code from [here](https://github.com/bertjiazheng/indoor-layout-evaluation)), default is disabled.
     - `--force_cube` force cube shape when evaluating, default is disabled.
     - `--wall_num` different corner number to evaluate, default is all.
     - `--save_eval` save the visualization evaluating results of each panorama, 
