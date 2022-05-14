@@ -183,3 +183,15 @@ our predicted results will not align with your input panoramas,
 you can use the output file (`vp.txt`) of vanishing points to reverse align them manually.
 
 - `--visualize_3d` 3D visualization of output results (need install dependencies and GUI desktop environment).
+
+
+# Citation
+If you use this code for your research, please cite
+```
+@InProceedings{jiang2022lgt,
+    author    = {Jiang, Zhigang and Xiang, Zhongzheng and Xu, Jinhua and Zhao, Ming},
+    title     = {LGT-Net: Indoor Panoramic Room Layout Estimation with Geometry-Aware Transformer Network},
+    booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+    year      = {2022}
+}
+```
