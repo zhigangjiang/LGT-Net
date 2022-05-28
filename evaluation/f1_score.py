@@ -3,7 +3,7 @@
 @time: 2022/01/28
 @description:
 Holistic 3D Vision Challenge on General Room Layout Estimation Track Evaluation Package
-https://github.com/bertjiazheng/indoor-layout-evaluation
+Reference: https://github.com/bertjiazheng/indoor-layout-evaluation
 """
 
 from scipy.optimize import linear_sum_assignment

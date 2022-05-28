@@ -99,11 +99,15 @@ class RelativePosition(nn.Module):
             # -255 ~ 0 ~ 255 all count : patch * 2 - 1
             count = patch_num * 2 - 1
             self.rpe_table = nn.Parameter(torch.Tensor(count, heads))
-
             nn.init.xavier_uniform_(self.rpe_table)
         elif rpe == 'lr_parameter_mirror':
             # 0 ~ 127 128 ~ 1 all count : patch_num // 2 + 1
             count = patch_num // 2 + 1
+            self.rpe_table = nn.Parameter(torch.Tensor(count, heads))
+            nn.init.xavier_uniform_(self.rpe_table)
+        elif rpe == 'lr_parameter_half':
+            # -127 ~ 0 ~ 128 all count : patch
+            count = patch_num
             self.rpe_table = nn.Parameter(torch.Tensor(count, heads))
             nn.init.xavier_uniform_(self.rpe_table)
         elif rpe == 'fix_angle':
@@ -114,17 +118,24 @@ class RelativePosition(nn.Module):
             self.register_buffer('rpe_table', rpe_table)
 
     def get_relative_pos_embed(self):
+        range_vec = torch.arange(self.patch_num)
+        distance_mat = range_vec[None, :] - range_vec[:, None]
         if self.rpe == 'lr_parameter':
-            range_vec = torch.arange(self.patch_num)
-            # -patch_num+1 ~ 0 ~ patch_num-1 -> 0 ~ patch_num-1 ~ patch_num * 2 - 2
-            distance_mat = range_vec[None, :] - range_vec[:, None] + (self.patch_num - 1)
+            # -255 ~ 0 ~ 255 -> 0 ~ 255 ~ 255 + 255
+            distance_mat += self.patch_num - 1  # remove negative
             return self.rpe_table[distance_mat].permute(2, 0, 1)[None]
         elif self.rpe == 'lr_parameter_mirror' or self.rpe == 'fix_angle':
-            range_vec = torch.arange(self.patch_num)
-            distance_mat = range_vec[None, :] - range_vec[:, None]
             distance_mat[distance_mat < 0] = -distance_mat[distance_mat < 0]  # mirror
             distance_mat[distance_mat > self.patch_num // 2] = self.patch_num - distance_mat[
                 distance_mat > self.patch_num // 2]  # remove repeat
+            return self.rpe_table[distance_mat].permute(2, 0, 1)[None]
+        elif self.rpe == 'lr_parameter_half':
+            distance_mat[distance_mat > self.patch_num // 2] = distance_mat[
+                 distance_mat > self.patch_num // 2] - self.patch_num  # remove repeat > 128  exp: 129 -> -127
+            distance_mat[distance_mat < -self.patch_num // 2 + 1] = distance_mat[
+                distance_mat < -self.patch_num // 2 + 1] + self.patch_num   # remove repeat < -127 exp: -128 -> 128
+            # -127 ~ 0 ~ 128 -> 0 ~ 0 ~ 127 + 127 + 128
+            distance_mat += self.patch_num//2 - 1  # remove negative
             return self.rpe_table[distance_mat].permute(2, 0, 1)[None]
 
     def forward(self, attn):

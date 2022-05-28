@@ -299,7 +299,7 @@ def get_heat_map(u_s, patch_num=256, sigma=2, window_width=15, show=False):
 
 
 def find_peaks(signal, size=15*2+1, min_v=0.05, N=None):
-    # code from HorizonNet
+    # code from HorizonNet: https://github.com/sunset1995/HorizonNet/blob/master/inference.py
     max_v = maximum_filter(signal, size=size, mode='wrap')
     pk_loc = np.where(max_v == signal)[0]
     pk_loc = pk_loc[signal[pk_loc] > min_v]
@@ -387,7 +387,8 @@ def layout2depth(boundaries: List[np.array], return_mask=False, show=False, came
     :param show:
     :return:
     """
-    # code from HorizonNet
+    # code from HorizonNet: https://github.com/sunset1995/HorizonNet/blob/master/eval_general.py
+
     w = len(boundaries[0])
     h = w//2
     # Convert corners to per-column boundary first

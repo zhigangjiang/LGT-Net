@@ -1,8 +1,0 @@
-numpy==1.21.0
-torch==1.7.1
-torchvision==0.8.2
-yacs==0.1.8
-einops==0.3.0
-opencv-python==4.5.3.56
-pylsd-nova==1.2.0
-

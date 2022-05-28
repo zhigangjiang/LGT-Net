@@ -3,7 +3,9 @@ This is PyTorch implementation of our paper "[LGT-Net: Indoor Panoramic Room Lay
 
 ![network](src/fig/network.png)
 # Demo
-**We provide a [demo script](https://colab.research.google.com/drive/1mvwXVXGlrkApdMW6_8_prFBHjxwTReA6?usp=sharing) that runs on [Google Clobe](https://colab.research.google.com/) and recommend that you test directly on it.**
+- [demo app](https://huggingface.co/spaces/zhigangjiang/LGT-Net) that runs on HuggingFace Space🤗.
+- [demo script](https://colab.research.google.com/drive/1mvwXVXGlrkApdMW6_8_prFBHjxwTReA6?usp=sharing) that runs on Google colab.
+
 
 
 
@@ -12,19 +14,6 @@ Install our dependencies:
 ```shell
 pip install -r requirements.txt
 ```
-or try using our development environment
-```shell
-pip install -r requirements_dev.txt
-```
----
-
-If you need 3d to visualize output results, install visualizer (code from [here](https://github.com/fuenwang/360LayoutVisualizer)) dependencies:
-```shell
-pip install -r visualization/visualizer/requirements.txt
-```
-macOS need to be aware of this issue:
-[Unable to load/find OpenGL](https://github.com/PixarAnimationStudios/USD/issues/1372#issuecomment-716925973).
-
 
 # Preparing Dataset
 ### MatterportLayout
@@ -183,7 +172,17 @@ our predicted results will not align with your input panoramas,
 you can use the output file (`vp.txt`) of vanishing points to reverse align them manually.
 
 - `--visualize_3d` 3D visualization of output results (need install dependencies and GUI desktop environment).
+- `--output_3d`  output the object file of 3D mesh reconstruction.
+# Acknowledgements
+The code style is modified based on [Swin-Transformer](https://github.com/microsoft/Swin-Transformer).
 
+Some components refer to the following projects:
+
+- [HorizonNet](https://github.com/sunset1995/HorizonNet#1-pre-processing-align-camera-rotation-pose)
+- [LED2-Net](https://github.com/fuenwang/LED2-Net)
+- [PanoPlane360](https://github.com/sunset1995/PanoPlane360)
+- [DuLa-Net ](https://github.com/SunDaDenny/DuLa-Net)
+- [indoor-layout-evaluation](https://github.com/bertjiazheng/indoor-layout-evaluation)
 
 # Citation
 If you use this code for your research, please cite
