@@ -20,7 +20,7 @@ from models.build import build_model
 from loss import GradLoss
 from postprocessing.post_process import post_process
 from preprocessing.pano_lsd_align import panoEdgeDetection, rotatePanorama
-from utils.boundary import corners2boundaries
+from utils.boundary import corners2boundaries, layout2depth
 from utils.conversion import depth2xyz
 from utils.logger import get_logger
 from utils.misc import tensor2np_d, tensor2np
@@ -29,6 +29,7 @@ from models.lgt_net import LGT_Net
 from utils.writer import xyz2json
 from visualization.boundary import draw_boundaries
 from visualization.floorplan import draw_floorplan, draw_iou_floorplan
+from visualization.obj3d import create_3d_obj
 
 
 def parse_option():
@@ -57,6 +58,9 @@ def parse_option():
 
     parser.add_argument('--visualize_3d', action='store_true',
                         help='visualize_3d')
+
+    parser.add_argument('--output_3d', action='store_true',
+                        help='output_3d')
 
     parser.add_argument('--device',
                         type=str,
@@ -101,7 +105,7 @@ def visualize_2d(img, dt, show_depth=True, show_floorplan=True, show=False, save
             floorplan = draw_iou_floorplan(dt['processed_xyz'][0][..., ::2], dt_xyz[..., ::2],
                                            dt_board_color=[1, 0, 0, 1], gt_board_color=[0, 1, 0, 1])
         else:
-            floorplan = show_alpha_floorplan(dt_xyz)
+            floorplan = show_alpha_floorplan(dt_xyz, border_color=[0, 1, 0, 1])
 
         vis_img = np.concatenate([vis_img, floorplan[:, 60:-60, :]], axis=1)
     if show:
@@ -141,10 +145,12 @@ def show_depth_normal_grad(dt):
     return dt_grad_img
 
 
-def show_alpha_floorplan(dt_xyz, side_l=512):
+def show_alpha_floorplan(dt_xyz, side_l=512, border_color=None):
+    if border_color is None:
+        border_color = [1, 0, 0, 1]
     fill_color = [0.2, 0.2, 0.2, 0.2]
     dt_floorplan = draw_floorplan(xz=dt_xyz[..., ::2], fill_color=fill_color,
-                                  border_color=[1, 0, 0, 1], side_l=side_l, show=False, center_color=[1, 0, 0, 1])
+                                  border_color=border_color, side_l=side_l, show=False, center_color=[1, 0, 0, 1])
     dt_floorplan = Image.fromarray((dt_floorplan * 255).astype(np.uint8), mode='RGBA')
     back = np.zeros([side_l, side_l, len(fill_color)], dtype=np.float)
     back[..., :] = [0.8, 0.8, 0.8, 1]
@@ -174,36 +180,52 @@ def inference():
             continue
         name = os.path.basename(img_path).split('.')[0]
         bar.set_description(name)
-        img = np.array(Image.open(img_path).resize((1024, 512), Image.BICUBIC))[..., :3]
+        img = np.array(Image.open(img_path).resize((1024, 512), Image.Resampling.BICUBIC))[..., :3]
         if args.post_processing is not None and 'manhattan' in args.post_processing:
             bar.set_description("Preprocessing")
             img, vp = preprocess(img, vp_cache_path=os.path.join(args.output_dir, f"{name}_vp.txt"))
 
         img = (img / 255.0).astype(np.float32)
-        run_one_inference(img, model, args, name)
+        run_one_inference(img, model, args, name, logger)
 
 
 def inference_dataset(dataset):
     bar = tqdm(dataset, ncols=100)
     for data in bar:
         bar.set_description(data['id'])
-        run_one_inference(data['image'].transpose(1, 2, 0), model, args, name=data['id'])
+        run_one_inference(data['image'].transpose(1, 2, 0), model, args, name=data['id'], logger=logger)
 
 
 @torch.no_grad()
-def run_one_inference(img, model, args, name):
+def run_one_inference(img, model, args, name, logger, show=True, show_depth=True,
+                      show_floorplan=True, mesh_format='.obj', mesh_resolution=1024):
     model.eval()
     dt = model(torch.from_numpy(img.transpose(2, 0, 1)[None]).to(args.device))
     if args.post_processing != 'original':
         dt['processed_xyz'] = post_process(tensor2np(dt['depth']), type_name=args.post_processing)
 
-    visualize_2d(img, dt, show=True, save_path=os.path.join(args.output_dir, f"{name}_pred.png"))
+    visualize_2d(img, dt,
+                 show_depth=show_depth,
+                 show_floorplan=show_floorplan,
+                 show=show,
+                 save_path=os.path.join(args.output_dir, f"{name}_pred.png"))
     output_xyz = dt['processed_xyz'][0] if 'processed_xyz' in dt else depth2xyz(tensor2np(dt['depth'][0]))
+
     json_data = save_pred_json(output_xyz, tensor2np(dt['ratio'][0])[0],
                                save_path=os.path.join(args.output_dir, f"{name}_pred.json"))
-    if args.visualize_3d:
-        from visualization.visualizer.visualizer import visualize_3d
-        visualize_3d(json_data, (img * 255).astype(np.uint8))
+    # if args.visualize_3d:
+    #     from visualization.visualizer.visualizer import visualize_3d
+    #     visualize_3d(json_data, (img * 255).astype(np.uint8))
+
+    if args.visualize_3d or args.output_3d:
+        dt_boundaries = corners2boundaries(tensor2np(dt['ratio'][0])[0], corners_xyz=output_xyz, step=None,
+                                           length=mesh_resolution if 'processed_xyz' in dt else None,
+                                           visible=True if 'processed_xyz' in dt else False)
+        dt_layout_depth = layout2depth(dt_boundaries, show=False)
+
+        create_3d_obj(cv2.resize(img, dt_layout_depth.shape[::-1]), dt_layout_depth,
+                      save_path=os.path.join(args.output_dir, f"{name}_3d{mesh_format}") if args.output_3d else None,
+                      mesh=True,  show=args.visualize_3d)
 
 
 if __name__ == '__main__':
@@ -211,7 +233,7 @@ if __name__ == '__main__':
     args = parse_option()
     config = get_config(args)
 
-    if 'cuda' in args.device and not torch.cuda.is_available():
+    if ('cuda' in args.device or 'cuda' in config.TRAIN.DEVICE) and not torch.cuda.is_available():
         logger.info(f'The {args.device} is not available, will use cpu ...')
         config.defrost()
         args.device = "cpu"
