@@ -19,6 +19,7 @@ pip install -r requirements.txt
 # Preparing Dataset
 ### MatterportLayout
 Office MatterportLayout dataset is at [here](https://github.com/ericsujw/Matterport3DLayoutAnnotation).
+>If you have problems using this dataset, attention to this [issue](https://github.com/zhigangjiang/LGT-Net/issues/6).
 
 Make sure the dataset files are stored as follows:
 ```
