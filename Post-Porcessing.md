@@ -1,4 +1,8 @@
 # Post-Processing 
+
+## Update
+- 2023.5.18 We found that it was unreasonable to use cross product to judge occlusion in post-processing. We fixed this problem. In addition, we add some optimizations to force the layout coordinates to align to satisfy the constraints based on the Manhattan assumption.
+
 ## Step
 
 1. Simplify polygon by [DP algorithm](https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm)

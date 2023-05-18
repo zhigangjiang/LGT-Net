@@ -3,6 +3,13 @@ This is PyTorch implementation of our paper "[LGT-Net: Indoor Panoramic Room Lay
 
 
 ![network](src/fig/network.png)
+
+
+# Update
+- 2023.5.18 Update post-processing. If you want to reproduce the post-processing results of paper, please switch to the old [commit](https://github.com/zhigangjiang/LGT-Net/tree/b642d6288e3a4bf265e54ab93eed3455e760402b). Check out the [Post-Porcessing.md](Post-Porcessing.md) for more information.
+
+
+
 # Demo
 - [demo app](https://huggingface.co/spaces/zhigangjiang/LGT-Net) that runs on HuggingFace Space🤗.
 - [demo script](https://colab.research.google.com/drive/1mvwXVXGlrkApdMW6_8_prFBHjxwTReA6?usp=sharing) that runs on Google colab.
