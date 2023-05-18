@@ -6,12 +6,19 @@ import cv2
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+import sys
+import os.path as osp
+sys.path.append(osp.abspath(osp.join(__file__, '../../../')))
 
 from visualization.floorplan import draw_floorplan
 
-
-def merge_near(lst, diag):
-    group = [[0, ]]
+def calc_angle(v1: np.array, v2: np.array):
+    norm = np.linalg.norm(v1) * np.linalg.norm(v2)
+    theta = np.arccos(np.dot(v1, v2) / norm)
+    return theta
+    
+def merge_near(lst, diag, min):
+    group = [[min, ]]
     for i in range(1, len(lst)):
         if lst[i][1] == 0 and lst[i][0] - np.mean(group[-1]) < diag * 0.02:
             group[-1].append(lst[i][0])
@@ -24,7 +31,7 @@ def merge_near(lst, diag):
     return group
 
 
-def fit_layout(floor_xz, need_cube=False, show=False, block_eps=0.2):
+def fit_layout(floor_xz, need_cube=False, show=False, block_eps=5):
     show_radius = np.linalg.norm(floor_xz, axis=-1).max()
     side_l = 512
     floorplan = draw_floorplan(xz=floor_xz, show_radius=show_radius, show=show, scale=1, side_l=side_l).astype(np.uint8)
@@ -51,8 +58,8 @@ def fit_layout(floor_xz, need_cube=False, show=False, block_eps=0.2):
     epsilon = 0.005 * cv2.arcLength(poly, True)
     poly = cv2.approxPolyDP(poly, epsilon, True)
 
-    x_lst = [[0, 0], ]
-    y_lst = [[0, 0], ]
+    x_lst = [[poly[:, 0, 0].min(), 0], ]
+    y_lst = [[poly[:, 0, 1].min(), 0], ]
 
     ans = np.zeros((floorplan_sub.shape[0], floorplan_sub.shape[1]))
 
@@ -67,9 +74,10 @@ def fit_layout(floor_xz, need_cube=False, show=False, block_eps=0.2):
         l2 = np.linalg.norm(cp2)
         l3 = np.linalg.norm(p12)
         # We added occlusion detection
-        is_block1 = abs(np.cross(cp1/l1, cp2/l2)) < block_eps
-        is_block2 = abs(np.cross(cp2/l2, p12/l3)) < block_eps*2
-        is_block = is_block1 and is_block2
+        is_block1 = np.rad2deg(calc_angle(cp1, cp2)) < block_eps
+        is_block2 = np.rad2deg(calc_angle(cp2, p12)) < block_eps*2
+        is_block3 = np.rad2deg(calc_angle(cp2, -p12)) < block_eps*2
+        is_block = is_block1 and (is_block2 or is_block3)
 
         if (p2[0] - p1[0]) == 0:
             slope = 10
@@ -103,27 +111,27 @@ def fit_layout(floor_xz, need_cube=False, show=False, block_eps=0.2):
     if debug_show:
         plt.figure(dpi=300)
         plt.axis('off')
-        a = cv2.drawMarker(floorplan_sub.copy()*0.5, tuple([floorplan_sub.shape[1] // 2, floorplan_sub.shape[0] // 2]), [1], markerType=0, markerSize=10, thickness=2)
+        a = cv2.drawMarker(floorplan_sub.copy()*0.5, tuple(sub_center.astype(int)), [1], markerType=0, markerSize=10, thickness=2)
         plt.imshow(cv2.drawContours(a, [poly], 0, 1, 1))
         plt.savefig('src/1.png', bbox_inches='tight', transparent=True, pad_inches=0)
         plt.show()
 
         plt.figure(dpi=300)
         plt.axis('off')
-        a = cv2.drawMarker(ans.copy()*0.5, tuple([floorplan_sub.shape[1] // 2, floorplan_sub.shape[0] // 2]), [1], markerType=0, markerSize=10, thickness=2)
+        a = cv2.drawMarker(ans.copy()*0.5, tuple(sub_center.astype(int)), [1], markerType=0, markerSize=10, thickness=2)
         plt.imshow(cv2.drawContours(a, [poly], 0, 1, 1))
         # plt.show()
         plt.savefig('src/2.png', bbox_inches='tight', transparent=True, pad_inches=0)
         plt.show()
 
-    x_lst.append([floorplan_sub.shape[1], 0])
-    y_lst.append([floorplan_sub.shape[0], 0])
+    x_lst.append([poly[:, 0, 0].max(), 0])
+    y_lst.append([poly[:, 0, 1].max(), 0])
     x_lst.sort(key=lambda x: x[0])
     y_lst.sort(key=lambda x: x[0])
 
     diag = math.sqrt(math.pow(floorplan_sub.shape[1], 2) + math.pow(floorplan_sub.shape[0], 2))
-    x_lst = merge_near(x_lst, diag)
-    y_lst = merge_near(y_lst, diag)
+    x_lst = merge_near(x_lst, diag, poly[:, 0, 0].min())
+    y_lst = merge_near(y_lst, diag, poly[:, 0, 1].min())
     if need_cube and len(x_lst) > 2:
         x_lst = [x_lst[0], x_lst[-1]]
     if need_cube and len(y_lst) > 2:
@@ -139,7 +147,7 @@ def fit_layout(floor_xz, need_cube=False, show=False, block_eps=0.2):
     if debug_show:
         plt.figure(dpi=300)
         plt.axis('off')
-        a = cv2.drawMarker(ans.copy() * 0.5, tuple([floorplan_sub.shape[1] // 2, floorplan_sub.shape[0] // 2]), [1],
+        a = cv2.drawMarker(ans.copy() * 0.5, tuple(sub_center.astype(int)), [1],
                            markerType=0, markerSize=10, thickness=2)
         plt.imshow(cv2.drawContours(a, [poly], 0, 1, 1))
         # plt.show()
@@ -155,21 +163,29 @@ def fit_layout(floor_xz, need_cube=False, show=False, block_eps=0.2):
             pred_polys = pred_polys[0]
 
     pred_polys.sort(key=lambda x: cv2.contourArea(x), reverse=True)
-    pred_polys = pred_polys[0]
+    pred_poly = pred_polys[0]
+    # findContours may produce errors, which are enforced here 
+    for i in range(len(pred_poly)):
+        p1 = pred_poly[i][0]
+        p2 = pred_poly[(i+1)%len(pred_poly)][0]
+        if abs(p1[0] - p2[0]) < abs(p1[1] - p2[1]):
+            p1[0] = p2[0]
+        else:
+            p1[1] = p2[1]
 
     if debug_show:
         plt.figure(dpi=300)
         plt.axis('off')
-        a = cv2.drawMarker(ans.copy() * 0.5, tuple([floorplan_sub.shape[1] // 2, floorplan_sub.shape[0] // 2]), [1],
+        a = cv2.drawMarker(ans.copy() * 0.5, tuple(sub_center.astype(int)), [1],
                            markerType=0, markerSize=10, thickness=2)
         a = cv2.drawContours(a, [poly], 0, 0.8, 1)
-        a = cv2.drawContours(a, [pred_polys], 0, 1, 1)
+        a = cv2.drawContours(a, [pred_poly], 0, 1, 1)
         plt.imshow(a)
         # plt.show()
         plt.savefig('src/4.png', bbox_inches='tight', transparent=True, pad_inches=0)
         plt.show()
 
-    polygon = [(p[0][1], p[0][0]) for p in pred_polys[::-1]]
+    polygon = [(p[0][1], p[0][0]) for p in pred_poly[::-1]]
 
     v = np.array([p[0] + sub_y for p in polygon])
     u = np.array([p[1] + sub_x for p in polygon])
@@ -211,6 +227,8 @@ def fit_layout(floor_xz, need_cube=False, show=False, block_eps=0.2):
 
 
 if __name__ == '__main__':
+    # processed_xz = fit_layout(floor_xz=np.load('/room_layout_estimation/lgt_net/floor_xz.npy'), need_cube=False, show=False)
+
     from utils.conversion import uv2xyz
 
     pano_img = np.zeros([512, 1024, 3])
