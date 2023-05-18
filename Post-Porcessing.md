@@ -1,7 +1,7 @@
 # Post-Processing 
 
 ## Update
-- 2023.5.18 We found that it was unreasonable to use cross product to judge occlusion in post-processing. We fixed this problem. In addition, we add some optimizations to force the layout coordinates to align to satisfy the constraints based on the Manhattan assumption.
+- 2023.5.18 We found that it was unreasonable to use cross product to detect occlusion in manhattan post-processing [layout.py#L70](https://github.com/zhigangjiang/LGT-Net/blob/b642d6288e3a4bf265e54ab93eed3455e760402b/postprocessing/dula/layout.py#L70). We fixed this problem [here](https://github.com/zhigangjiang/LGT-Net/blob/aae66ab9a2f361bc4e16af564f244acff5ec8aee/postprocessing/dula/layout.py#LL80C4-L80C15). In addition, we add some optimizations to force the layout coordinates to align to satisfy the constraints based on the Manhattan assumption.
 
 ## Step
 
