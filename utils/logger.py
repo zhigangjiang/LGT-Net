@@ -18,7 +18,7 @@ def build_logger(config):
 
 
 @functools.lru_cache()
-def get_logger(output_dir=None, local_rank=None, name="PLTNet"):
+def get_logger(output_dir=None, local_rank=None, name="LGTNet"):
     if output_dir and not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
