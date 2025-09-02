@@ -22,7 +22,7 @@ def convert_img(value, h, need_nor=True, cmap=None):
     elif cmap == cv2.COLORMAP_PLASMA:
         grad_img = cv2.applyColorMap((grad_img * 255).astype(np.uint8), colormap=cmap)
         grad_img = grad_img[..., ::-1]
-        grad_img = grad_img.astype(np.float) / 255.0
+        grad_img = grad_img.astype(np.float64) / 255.0
     elif cmap == 'HSV':
         grad_img = np.round(grad_img * 1000) / 1000.0
         grad_img = grad_img[..., np.newaxis].repeat(3, axis=-1)
@@ -31,7 +31,7 @@ def convert_img(value, h, need_nor=True, cmap=None):
         grad_img[..., 2] = 255
         grad_img = grad_img.astype(np.uint8)
         grad_img = cv2.cvtColor(grad_img, cv2.COLOR_HSV2RGB)
-        grad_img = grad_img.astype(np.float) / 255.0
+        grad_img = grad_img.astype(np.float64) / 255.0
     return grad_img
 
 
