@@ -1,0 +1,88 @@
+[tool.poetry]
+name = "lgt-net"
+version = "0.1.0"
+description = "LGT-Net: Indoor Panoramic Room Layout Estimation"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+packages = [{include = "config"}, {include = "dataset"}, {include = "evaluation"}, {include = "loss"}, {include = "models"}, {include = "postprocessing"}, {include = "preprocessing"}, {include = "utils"}, {include = "visualization"}]
+
+[tool.poetry.dependencies]
+python = ">=3.8,<4.0"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.4.0"
+pytest-cov = "^4.1.0"
+pytest-mock = "^3.11.0"
+
+[tool.poetry.scripts]
+test = "pytest:main"
+tests = "pytest:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--verbose",
+    "--cov=config",
+    "--cov=dataset",
+    "--cov=evaluation",
+    "--cov=loss",
+    "--cov=models",
+    "--cov=postprocessing",
+    "--cov=preprocessing",
+    "--cov=utils",
+    "--cov=visualization",
+    "--cov-report=term-missing",
+    "--cov-report=html:htmlcov",
+    "--cov-report=xml:coverage.xml",
+    "--cov-fail-under=80",
+]
+markers = [
+    "unit: marks tests as unit tests (deselect with '-m \"not unit\"')",
+    "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+
+[tool.coverage.run]
+source = ["config", "dataset", "evaluation", "loss", "models", "postprocessing", "preprocessing", "utils", "visualization"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__init__.py",
+    "*/conftest.py",
+    "main.py",
+    "app.py",
+    "inference.py",
+    "convert_ckpt.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+show_missing = true
+skip_covered = false
+precision = 2
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+[tool.coverage.xml]
+output = "coverage.xml"
