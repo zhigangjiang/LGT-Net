@@ -160,11 +160,22 @@ def show_alpha_floorplan(dt_xyz, side_l=512, border_color=None):
     return dt_floorplan
 
 
+class NpEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
+
+
 def save_pred_json(xyz, ration, save_path):
     # xyz[..., -1] = -xyz[..., -1]
     json_data = xyz2json(xyz, ration)
     with open(save_path, 'w') as f:
-        f.write(json.dumps(json_data, indent=4) + '\n')
+        f.write(json.dumps(json_data, indent=4, cls=NpEncoder) + '\n')
     return json_data
 
 

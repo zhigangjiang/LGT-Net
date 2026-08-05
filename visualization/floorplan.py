@@ -29,7 +29,7 @@ def draw_floorplan(xz, fill_color=None, border_color=None, side_l=512, show_radi
     if fill_color is None:
         fill_color = [1]
 
-    board = np.zeros([side_l, side_l, len(fill_color)], dtype=np.float)
+    board = np.zeros([side_l, side_l, len(fill_color)], dtype=np.float64)
 
     if show_radius is None:
         show_radius = np.linalg.norm(xz, axis=-1).max()
@@ -43,7 +43,7 @@ def draw_floorplan(xz, fill_color=None, border_color=None, side_l=512, show_radi
     # |------------u
     xz[:, 1] = -xz[:, 1]
     xz += side_l // 2  # moving to center
-    xz = xz.astype(np.int)
+    xz = xz.astype(np.int64)
     cv2.fillPoly(board, [xz], fill_color)
     if border_color:
         cv2.drawContours(board, [xz], 0, border_color, 2)
@@ -101,7 +101,7 @@ def draw_iou_floorplan(dt_xz, gt_xz, show_radius=None, show=False, side_l=512,
     gt_floorplan = Image.fromarray((gt_floorplan * 255).astype(np.uint8), mode='RGBA')
     iou_floorplan = Image.alpha_composite(gt_floorplan, dt_floorplan)
 
-    back = np.zeros([side_l, side_l, len(fill_color)], dtype=np.float)
+    back = np.zeros([side_l, side_l, len(fill_color)], dtype=np.float64)
     back[..., :] = [0.8, 0.8, 0.8, 1]
     back = Image.fromarray((back * 255).astype(np.uint8), mode='RGBA')
 

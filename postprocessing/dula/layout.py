@@ -155,15 +155,11 @@ def fit_layout(floor_xz, need_cube=False, show=False, block_eps=5):
         plt.show()
 
     pred = np.uint8(ans)
-    pred_polys = cv2.findContours(pred, 1, 3)
-    if isinstance(pred_polys, tuple):
-        if len(pred_polys) == 3:
-            pred_polys = pred_polys[1]
-        else:
-            pred_polys = pred_polys[0]
 
-    pred_polys.sort(key=lambda x: cv2.contourArea(x), reverse=True)
-    pred_poly = pred_polys[0]
+
+    pred_polys, hierarchy = cv2.findContours(pred, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    pred_polys = sorted(pred_polys, key=cv2.contourArea)
+    pred_poly = pred_polys[-1]
     # findContours may produce errors, which are enforced here 
     for i in range(len(pred_poly)):
         p1 = pred_poly[i][0]
